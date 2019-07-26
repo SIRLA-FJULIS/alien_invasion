@@ -180,7 +180,7 @@ def game_intro(): #開始畫面
                 if event.key == pygame.K_SPACE :
                     run_game()
         draw_text("Press space to start game", 40, BLACK, 450, 400, screen)
-        pygame.9.flip()
+        pygame.display.flip()
 
 def run_game():#遊戲進行
     pygame.init()
