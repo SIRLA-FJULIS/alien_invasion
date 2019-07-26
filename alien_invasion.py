@@ -22,10 +22,9 @@ class Settings():
         self.WHITE = (225,225,225)
 
 class Ship():
-    def __init__(self, ai_settings, screen):
+    def __init__(self, screen):
         #設置飛船的初始位置
         self.screen = screen
-        self.ai_settings = ai_settings
         
         self.image = pygame.image.load('ship.png')#載入飛船圖像
         self.rect = self.image.get_rect()#取得他的矩形
@@ -35,7 +34,7 @@ class Ship():
         self.rect.bottom = self.screen_rect.bottom #飛船的y值 = 螢幕的底部y值
  
         #将飛船的属性center中存成小數
-        self.center=float(self.rect.centerx)
+        self.center=float(self.rect.centerx)  #center名稱可以變成更準確的
  
         #移動標誌
         self.moving_right = False
@@ -51,9 +50,8 @@ class Ship():
         self.screen.blit(self.image, self.rect)
 
 class Alien():
-    def __init__(self, ai_settings, screen):
+    def __init__(self, screen):
         self.screen = screen
-        self.ai_settings = ai_settings
         self.image = pygame.image.load('alien.png')#載入圖片
         self.rect = self.image.get_rect()#取得外星人的矩形
         self.rect.centerx = 0#設定中間值x
@@ -76,9 +74,8 @@ class Alien():
         self.screen.blit(self.image, self.rect)
 
 class Bullet():
-    def __init__(self, ai_settings, screen, ship):
+    def __init__(self, screen, ship):
         self.screen = screen
-        self.ai_settings = ai_settings
 
         #在（0,0）處創建一個表示子彈的矩形，再設置正确的位置
         self.rect = pygame.Rect(0,0,10,15)
@@ -105,13 +102,14 @@ def draw_text(text, size, color, x, y,screen): #文字輸出
     text_rect.center = (x, y)
     screen.blit(text_surface, text_rect)
 
-def update_screen(ai_settings, screen, ship, bullets, alien, aliens) :
+def update_screen(ai_settings, screen, ship, bullets, aliens) :
     #每次循環時更新畫面
     screen.fill(ai_settings.bg_color)
 
     #在飛船和外星人后面重新繪製所有子彈
     for bullet in bullets: 
         bullet.draw()
+
     ship.blitme()
 
     for alien in aliens:
@@ -133,7 +131,7 @@ def collision_check(object_A, object_B):
     #碰撞檢查
     return(object_A.rect.colliderect(object_B.rect)) #判斷兩個rect是否有碰撞
 
-def check_keydown_events(event, ai_settings, screen, ship, bullets, last_shoot) :
+def check_keydown_events(event, screen, ship, bullets) :
     #按鍵按下
     if event.key == pygame.K_RIGHT :
         ship.moving_right =True
@@ -141,7 +139,7 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets, last_shoot) 
          ship.moving_left =True
     elif event.key == pygame.K_SPACE :
         if magazine[0] > 0: #如果有子彈的話
-            new_bullet = Bullet(ai_settings,screen,ship)
+            new_bullet = Bullet(screen,ship)
             bullets.append(new_bullet)
             magazine[0] = magazine[0] - 1
  
@@ -152,13 +150,13 @@ def check_keyup_events(event,ship) :
     elif event.key == pygame.K_LEFT :
          ship.moving_left =False
  
-def check_events(ai_settings,screen,ship,bullets):
+def check_events(screen,ship,bullets):
     #按鍵相關
     for event in pygame.event.get():
         if event.type == pygame.QUIT :
             quitgame()
         elif event.type == pygame.KEYDOWN :
-            check_keydown_events(event, ai_settings, screen, ship,bullets, last_shoot)
+            check_keydown_events(event, screen, ship,bullets)
         elif event.type == pygame.KEYUP :
             check_keyup_events(event, ship)
 
@@ -182,7 +180,7 @@ def game_intro(): #開始畫面
                 if event.key == pygame.K_SPACE :
                     run_game()
         draw_text("Press space to start game", 40, BLACK, 450, 400, screen)
-        pygame.display.flip()
+        pygame.9.flip()
 
 def run_game():#遊戲進行
     pygame.init()
@@ -190,22 +188,22 @@ def run_game():#遊戲進行
     screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
     pygame.display.set_caption("Alien Invasion")
 
-    ship = Ship(ai_settings,screen)
-    alien = Alien(ai_settings,screen)
+    ship = Ship(screen)
+    alien = Alien(screen)
     game_time = pygame.time.get_ticks()
 
     #開始遊戲
     while True:
         # 查看事件
-        check_events(ai_settings, screen, ship, bullets) #確定按鍵是否有被使用
+        check_events(screen, ship, bullets) #確定按鍵是否有被使用
         ship.update() #載入飛船
 
         if pygame.time.get_ticks() % 500 == 0: #每500毫秒產生一個新的外星人
-            aliens.append(Alien(ai_settings, screen))
+            aliens.append(Alien(screen))
 
         for alien in aliens:
             alien.update() #載入外星人
-            if alien.rect.bottom >= 600:  #如果外星人到達底線，則消失
+            if alien.rect.bottom >= 536:  #如果外星人到達底線，則消失
                 aliens.remove(alien)  #移除外星人
                 score[0] = score[0] - 5
 
@@ -217,8 +215,8 @@ def run_game():#遊戲進行
             magazine[0] = magazine[0] + 1
             last_shoot[0] = shoot
 
-        update_screen(ai_settings, screen, ship, bullets, alien, aliens) #更新畫面
-        if pygame.time.get_ticks() - game_time > 10000: #100秒後遊戲結束
+        update_screen(ai_settings, screen, ship, bullets, aliens) #更新畫面
+        if pygame.time.get_ticks() - game_time > 100000: #100秒後遊戲結束
             time_up(screen)
             break
 
